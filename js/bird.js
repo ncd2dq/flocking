@@ -47,12 +47,14 @@ class Bird{
         // This function makes the bird wobble up and down as an animation technique to simulate flight
         // ::param frame_count:: integer
         if(frame_count % this.wobble_rate == 0){
+            // Advance wobble cycle animation
             if(this.wobble_cycle < this.wobble_max_cycle){
                 this.wobble_cycle++;
             } else {
                 this.wobble_cycle = 0;
             }
             
+            // Apply wobble to position
             if(this.wobble_cycle == 0){
                 this.position.y -= this.wobble_magnitude;
             } else if (this.wobble_cycle == 1){
