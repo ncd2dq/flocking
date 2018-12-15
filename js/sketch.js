@@ -18,7 +18,7 @@ function setup(){
     rectMode(CENTER);
     frameRate(40);
     
-    for(let i = 0; i < 600; i++){
+    for(let i = 0; i < 3; i++){
         test_bs.push(new Bird(bird_images, 50));
     }
 
@@ -27,15 +27,18 @@ function setup(){
 function draw(){
     clear();
     
+    mouse_vec = new Vector(mouseX, mouseY);
     for(test_b of test_bs){
-        test_b.run(frameCount);
+        test_b.run(frameCount, mouse_vec);
     }
-    
-    
-/*    let x = 100, y = 100;
-    translate(x, y);
-    rotate(angle);
-    rect(0, 0, 50, 50);
-    translate(0, 0);*/
 
+}
+
+function mousePressed(){
+    for(bird of test_bs){
+        let mouse_vec = new Vector(mouseX, mouseY);
+        mouse_vec = mouse_vec.sub(bird.position, false);
+        mouse_vec = mouse_vec.direction(false);
+        bird.apply_force(mouse_vec);
+    }
 }

@@ -14,7 +14,9 @@ class Bird{
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
         
+        //
         // Animation --
+        //
         // Wobble up and down to imitate upward force of wings flapping
         this.wobble_max_cycle = 3;
         this.wobble_cycle = Math.floor(Math.random() * 3);
@@ -27,11 +29,23 @@ class Bird{
         this.last_frame_update = 0;
         this.frame_update_threshold = 3; // Higher numbers yield slower animation
         this.image_scale = rel_size;
-        
-        this.angle = 0;
+    }
+    
+    apply_force(force){
+        //Apply a force to objects current velocity
+        // ::param force:: Vector
+        this.acceleration.add(force, true);
+    }
+    
+    update_kinematics(){
+        this.velocity.add(this.acceleration, true);
+        this.position.add(this.velocity, true);
+        this.acceleration.zero();
     }
     
     realistic_wobble(frame_count){
+        // This function makes the bird wobble up and down as an animation technique to simulate flight
+        // ::param frame_count:: integer
         if(frame_count % this.wobble_rate == 0){
             if(this.wobble_cycle < this.wobble_max_cycle){
                 this.wobble_cycle++;
@@ -63,10 +77,10 @@ class Bird{
         }
     }
     
-    rotate_bird(){
+    rotate_bird(facing_vec){
         //Rotate this bird between itself and another vector
-        let mouse_vec = new Vector(mouseX, mouseY);
-        let angle = this.position.angle_between(mouse_vec);
+        // ::param facing_vec:: Vector class where the bird should be facing
+        let angle = this.position.angle_between(facing_vec);
         push();
         translate(this.position.x, this.position.y);
         rotate(angle);
@@ -78,11 +92,10 @@ class Bird{
         image(this.frames[this.animation_index], 0, 0, this.image_scale, this.image_scale);
     }
     
-    run(frame_count){
-
-        this.rotate_bird();
-
-        this.angle++;
+    run(frame_count, facing_vec){
+        this.update_kinematics();
+        this.rotate_bird(facing_vec);
+        
         // Animation --
         this.realistic_wobble(frame_count);
         this.animate(frame_count);

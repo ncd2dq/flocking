@@ -12,6 +12,11 @@ class Vector{
         this.y = y;
     }
     
+    zero(){
+        this.x = 0;
+        this.y = 0;
+    }
+    
     dot(other){
         //Dot product of vectors
         const dot_prod = this.x * other.x + this.y * other.y;
