@@ -18,7 +18,7 @@ function setup(){
     rectMode(CENTER);
     frameRate(40);
     
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < 100; i++){
         test_bs.push(new Bird(bird_images, 50));
     }
 
