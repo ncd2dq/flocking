@@ -9,13 +9,15 @@ function create_animation_frames(){
 
 class Bird{
     constructor(animation_frames, rel_size){
+        //
         // Kinematics
+        //
         this.position = new Vector(Math.random() * width, Math.random() * height);
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
         
         //
-        // Animation --
+        // Animation
         //
         // Wobble up and down to imitate upward force of wings flapping
         this.wobble_max_cycle = 3;
@@ -38,6 +40,7 @@ class Bird{
     }
     
     update_kinematics(){
+        //Physics engine to update movement dynamics
         this.velocity.add(this.acceleration, true);
         this.position.add(this.velocity, true);
         this.acceleration.zero();
