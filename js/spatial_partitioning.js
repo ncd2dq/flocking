@@ -55,6 +55,7 @@ class SpatialPartition{
         }
     }
     
+    // ERRONEOUS
     upkeep(){
         // Ensure that all birds are in their correct partition
         //SOMETHING IS WRONG WITH THIS AND BIRDS WEREN'T GETTING UPDATED

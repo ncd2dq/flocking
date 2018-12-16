@@ -77,7 +77,6 @@ function draw(){
 
     spatial_partition.reset_grid();
     spatial_partition.fill(all_birds);
-    //spatial_partition.upkeep();
     spatial_partition.display();
 
 }
