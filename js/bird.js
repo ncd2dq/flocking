@@ -31,6 +31,9 @@ class Bird{
         this.last_frame_update = 0;
         this.frame_update_threshold = 3; // Higher numbers yield slower animation
         this.image_scale = rel_size;
+        
+        // Spatial Partition
+        this.partition = [];
     }
     
     apply_force(force){
@@ -44,6 +47,19 @@ class Bird{
         this.velocity.add(this.acceleration, true);
         this.position.add(this.velocity, true);
         this.acceleration.zero();
+    }
+    
+    edges(){
+        //Ensure that the birds do not go off screen
+        if(this.position.x >= width){
+            this.position.x = 0;
+        } else if (this.position.x <= 0){
+            this.position.x = width;
+        } else if (this.position.y >= height){
+            this.position.y = 0;
+        } else if (this.position.y <= 0){
+            this.position.y = height;
+        }
     }
     
     realistic_wobble(frame_count){
@@ -97,13 +113,37 @@ class Bird{
         image(this.frames[this.animation_index], 0, 0, this.image_scale, this.image_scale);
     }
     
+    display_partition(){
+        text('<' + this.partition[0] + ', ' + this.partition[1] + '>', this.position.x, this.position.y + 35);
+    }
+    
+    cohesion_force(){
+        
+    }
+    
+    alignment_force(){
+        
+    }
+    
+    separation_force(){
+        
+    }
+    
+    flock(){
+        
+    }
+    
     run(frame_count, facing_vec){
         this.update_kinematics();
         this.rotate_bird(facing_vec);
         
         // Animation --
         this.realistic_wobble(frame_count);
+        this.edges();
         this.animate(frame_count);
+        
+        // Debug
+        this.display_partition();
     }
     
     

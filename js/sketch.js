@@ -8,6 +8,8 @@ let bird_count_slider, cohesion_slider, separation_slider, alignment_slider;
 let bird_count = 25, cohesion_rate = 0, separation_rate = 0, alignment_rate = 0;
 let cohesion_range = 10, separation_range = 10, alignment_range = 10;
 
+let spatial_partition;
+
 function preload(){
     //Preload all bird images and use them multiple times
     bird_images = create_animation_frames();
@@ -49,11 +51,18 @@ function setup(){
     rectMode(CENTER);
     frameRate(40);
     
+    // Spatial Partitioning initialize
+    spatial_partition = new SpatialPartition(width, height, 5, 5);
+    
+    // Add initial birds to bird list
     for(let i = 0; i < bird_count; i++){
         all_birds.push(new Bird(bird_images, 50));
     }
+    
+    spatial_partition.fill(all_birds);
 
 }
+
 
 function draw(){
     clear();
@@ -61,11 +70,18 @@ function draw(){
     
     // Run all birds
     mouse_vec = new Vector(mouseX, mouseY);
-    for(test_b of all_birds){
+    for(let test_b of all_birds){
         test_b.run(frameCount, mouse_vec);
     }
+    
+
+    spatial_partition.reset_grid();
+    spatial_partition.fill(all_birds);
+    //spatial_partition.upkeep();
+    spatial_partition.display();
 
 }
+
 
 function update_simulation_parameters(){
     // Update game parameters only if slider values change
@@ -76,12 +92,15 @@ function update_simulation_parameters(){
         let diff = bird_count_new - bird_count;
         if(diff > 0){
             for(let i = 0; i < diff; i++){
-                all_birds.push(new Bird(bird_images, 50));
+                const new_bird = new Bird(bird_images, 50)
+                all_birds.push(new_bird);
+                spatial_partition.fill([new_bird]);
             }
         } else {
             diff *= -1
             for(let i = 0; i < diff; i++){
-                all_birds.pop();
+                let removed_bird = all_birds.pop();
+                spatial_partition.grid[removed_bird.partition[0]][removed_bird.partition[1]].pop(removed_bird);
             }
         }
         bird_count = bird_count_new;
@@ -115,6 +134,7 @@ function update_simulation_parameters(){
         alignment_range = alignment_range_new;
     }
 }
+
 
 function mousePressed(){
     if(mouseX < width && mouseY < height){
