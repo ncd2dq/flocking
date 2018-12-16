@@ -9,6 +9,7 @@ let bird_count = 25, cohesion_rate = 0, separation_rate = 0, alignment_rate = 0;
 let cohesion_range = 10, separation_range = 10, alignment_range = 10;
 
 let spatial_partition;
+let spatial_copy;
 
 function preload(){
     //Preload all bird images and use them multiple times
@@ -20,6 +21,11 @@ function setup(){
     let canv = createCanvas(width, height);
     canv.parent('the_canvas');
     
+    // Spatial Partitioning initialize
+    spatial_partition = new SpatialPartition(width, height, 7, 7);
+    // Max range should be the radius of the circle enscribed by the 9 partition boxes
+    let max_range = Math.floor(spatial_partition.row_len * 3) / 2;
+
     // Create customization sliders
     bird_count_slider = createSlider(0, 200, bird_count); 
     let bird_count_label = createDiv('Bird Count: ');
@@ -35,13 +41,13 @@ function setup(){
     let alignment_label = createDiv('Alignment: ');
     alignment_slider.parent(alignment_label);
     // Perception range sliders
-    cohesion_range_slider = createSlider(0, 100, cohesion_range);
+    cohesion_range_slider = createSlider(0, max_range, cohesion_range);
     let cohesion_range_label = createDiv('Cohesion Range--||: ');
     cohesion_range_slider.parent(cohesion_range_label);
-    separation_range_slider = createSlider(0, 100, separation_range);
+    separation_range_slider = createSlider(0, max_range, separation_range);
     let separation_range_label = createDiv('Separation Range-|: ');
     separation_range_slider.parent(separation_range_label);
-    alignment_range_slider = createSlider(0, 100, alignment_range);
+    alignment_range_slider = createSlider(0, max_range, alignment_range);
     let alignment_range_label = createDiv('Alignment Range-|: ');
     alignment_range_slider.parent(alignment_range_label);
     
@@ -50,9 +56,6 @@ function setup(){
     imageMode(CENTER);
     rectMode(CENTER);
     frameRate(40);
-    
-    // Spatial Partitioning initialize
-    spatial_partition = new SpatialPartition(width, height, 5, 5);
     
     // Add initial birds to bird list
     for(let i = 0; i < bird_count; i++){
@@ -67,11 +70,12 @@ function setup(){
 function draw(){
     clear();
     update_simulation_parameters();
+    spatial_copy = spatial_partition.grid_copy();
     
     // Run all birds
     mouse_vec = new Vector(mouseX, mouseY);
-    for(let test_b of all_birds){
-        test_b.run(frameCount, mouse_vec);
+    for(let bird of all_birds){
+        bird.run(frameCount, mouse_vec, spatial_copy);
     }
     
 

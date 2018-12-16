@@ -19,7 +19,44 @@ class SpatialPartition{
         }
     }
     
+    grid_copy(){
+        let grid_c = {'position': [], 'velocity': []};
+        
+        for(let i = 0; i < this.rows; i++){
+            let new_p_row = [];
+            let new_v_row = [];
+            for(let j = 0; j < this.cols; j++){
+                new_p_row.push(this.snap_shot([i, j], 'position'));
+                new_v_row.push(this.snap_shot([i, j], 'velocity'));
+            }
+            grid_c['position'].push(new_p_row);
+            grid_c['velocity'].push(new_v_row);
+        }
+        
+        return grid_c;
+    }
+    
+    snap_shot(partition, type){
+        // Produce a snapshot of positions or velocity
+        // birds will use to not update one at at time but rather all at once
+        // ::param partition:: List[int, int] position in grid
+        // ::param type:: position/velocity to indicate what type of snapshot is needed
+        let partition_copy = [];
+        if(type == 'position'){
+            for(let bird of this.grid[partition[0]][partition[1]]){
+                partition_copy.push(JSON.parse(JSON.stringify(bird.position)));
+            } 
+        } else {
+            for(let bird of this.grid[partition[0]][partition[1]]){
+                partition_copy.push(JSON.parse(JSON.stringify(bird.velocity)));
+            }
+        }
+        
+        return partition_copy;
+    }
+    
     reset_grid(){
+        // Recreates a proper empty grid
         this.grid = [];
         for(let i = 0; i < this.rows; i++){
             this.grid.push([]);

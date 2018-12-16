@@ -110,11 +110,34 @@ class Bird{
     }
     
     display(){
+        //All drawing occurs at 0 because of the push/translate/rotate/pop
         image(this.frames[this.animation_index], 0, 0, this.image_scale, this.image_scale);
     }
     
-    display_partition(){
-        text('<' + this.partition[0] + ', ' + this.partition[1] + '>', this.position.x, this.position.y + 35);
+    debug(p=false, c=false, s=false, a=false){
+        // Debug drawing
+        // ::param p:: parition
+        // ::param c:: cohesion circle
+        // ::param s:: separation circle
+        // ::param a:: alignment circle
+        if(p){
+            text('<' + this.partition[0] + ', ' + this.partition[1] + '>', this.position.x, this.position.y + 35);
+        }
+        if(c){
+            noFill();
+            stroke(255, 0, 0);
+            ellipse(this.position.x, this.position.y, cohesion_range, cohesion_range);
+        }
+        if(s){
+            noFill();
+            stroke(0, 255, 0);
+            ellipse(this.position.x, this.position.y, separation_range, separation_range);
+        }
+        if(a){
+            noFill();
+            stroke(0, 0, 255);
+            ellipse(this.position.x, this.position.y, alignment_range, alignment_range);
+        }
     }
     
     cohesion_force(){
@@ -125,15 +148,34 @@ class Bird{
         
     }
     
-    separation_force(){
+    separation_force(spatial_part){
+        // Determine the average vector to move away from all birds near me
+        let avg_sep = new Vector(0, 0);
+        let count = 0;
         
+        
+        for(let position_vec of spatial_part){
+            avg_sep.add(position_vec, true);
+            count++;
+        }
+        
+        avg_sep.scale(1 / count, true);
+        avg_sep.sub(this.position);
+        
+    }
+    
+    get_all_birds_to_check(spatial_part){
+        // Returns the portions of the spatial partition that this bird will check
     }
     
     flock(){
         
     }
     
-    run(frame_count, facing_vec){
+    run(frame_count, facing_vec, spatial_part){
+        
+        this.separation_force(spatial_part['position']);
+        
         this.update_kinematics();
         this.rotate_bird(facing_vec);
         
@@ -142,8 +184,7 @@ class Bird{
         this.edges();
         this.animate(frame_count);
         
-        // Debug
-        this.display_partition();
+        this.debug(true);
     }
     
     
