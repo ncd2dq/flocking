@@ -226,7 +226,7 @@ class Bird{
         this.edges();
         this.animate(frame_count);
         
-        this.debug(true);
+        this.debug(true, true, true, true);
     }
     
     
