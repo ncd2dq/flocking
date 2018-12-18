@@ -20,6 +20,7 @@ class SpatialPartition{
     }
     
     grid_copy(){
+        // ::return:: List[List[List[Vector]]] - > [ [[], [], []], [[], [], []] ]
         let grid_c = {'position': [], 'velocity': []};
         
         for(let i = 0; i < this.rows; i++){

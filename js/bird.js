@@ -164,8 +164,50 @@ class Bird{
         
     }
     
-    get_all_birds_to_check(spatial_part){
-        // Returns the portions of the spatial partition that this bird will check
+    get_all_vectors_to_check(spatial_part){
+        // ::param spatial_partition::
+        // ::param check_indexes:: dictionary {'rows': List[int], 'cols': List[int]} of what to check in spatial_partition
+        // ::return:: Dictionary[List[List[List[Vector]]]]
+        
+        let vectors = {'position': [], 'velocity': []};
+        let check_indexes = this._get_indexes_to_check(spatial_part);
+        
+        for(let i of check_indexes['rows']){
+            for(let j of check_indexes['cols']){
+                // nothing
+            }
+        }
+        
+        return vectors;
+    }
+    
+    _get_indexes_to_check(spatial_part){
+        // Returns the row / col indexes that a bird should check in the spatial_part dictionaries
+        // checks through the 9 surrounding boxes
+        
+        // TODO: convert this to a preestablished hashmap and have the birds look up their
+        //spatial partition as the key, eliminates the need for every bird to do this calculation
+        let rows, cols;
+        // Row finder
+        if(this.partition[0] == 0){
+            rows = [spatial_part['position'].length, 0, 1]; 
+        } else if (this.partition[0] == spatial_part['position'].length - 1){
+            rows = [this.partition[0] - 1, this.partition[0], 0]
+        } else {
+            rows = [this.partition[0] - 1, this.partition[0], this.partition[0] + 1];
+        }
+        // Col finder
+        if(this.partition[1] == 0){
+            cols = [spatial_part['position'][0].length, 0, 1]; 
+        } else if (this.partition[1] == spatial_part['position'][0].length - 1){
+            cols = [this.partition[1] - 1, this.partition[1], 0]
+        } else {
+            cols = [this.partition[1] - 1, this.partition[1], this.partition[1] + 1];
+        }
+        
+        return {'rows': rows, 'cols': cols};
+        
+
     }
     
     flock(){
