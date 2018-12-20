@@ -5,7 +5,7 @@ const height = 600;
 
 let bird_images;
 let bird_count_slider, cohesion_slider, separation_slider, alignment_slider;
-let bird_count = 25, cohesion_rate = 0, separation_rate = 0, alignment_rate = 0;
+let bird_count = 1, cohesion_rate = 0, separation_rate = 0, alignment_rate = 0;
 let cohesion_range = 10, separation_range = 10, alignment_range = 10;
 
 let spatial_partition;
@@ -82,7 +82,6 @@ function draw(){
     spatial_partition.reset_grid();
     spatial_partition.fill(all_birds);
     spatial_partition.display();
-
 }
 
 

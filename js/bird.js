@@ -15,6 +15,7 @@ class Bird{
         this.position = new Vector(Math.random() * width, Math.random() * height);
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
+        this.max_speed = 10;
         
         //
         // Animation
@@ -47,6 +48,11 @@ class Bird{
         this.velocity.add(this.acceleration, true);
         this.position.add(this.velocity, true);
         this.acceleration.zero();
+        
+        if(this.velocity.distance() > this.max_speed){
+            this.velocity.direction(true);
+            this.velocity.scale(this.max_speed, true);
+        }
     }
     
     edges(){
@@ -159,13 +165,17 @@ class Bird{
             count++;
         }
         
+
+        
         avg_sep.scale(1 / count, true);
-        avg_sep.sub(this.position);
+        avg_sep.sub(this.position, true);
+        avg_sep.scale(-0.01, true);
+        this.apply_force(avg_sep);
         
     }
     
     get_all_vectors_to_check(spatial_part){
-        // ::param spatial_partition::
+        // ::param spatial_partition:: Dict[str, List[List[List[Vector]]]] - > [ [[], [], []], [[], [], []] ]
         // ::param check_indexes:: dictionary {'rows': List[int], 'cols': List[int]} of what to check in spatial_partition
         // ::return:: Dictionary[List[List[List[Vector]]]]
         
@@ -174,7 +184,17 @@ class Bird{
         
         for(let i of check_indexes['rows']){
             for(let j of check_indexes['cols']){
-                // nothing
+                try{
+                    for(let vec of spatial_part['velocity'][i][j]){
+                        vectors['velocity'].push(vec);  
+                    }
+                    for(let vec of spatial_part['position'][i][j]){
+                        vectors['position'].push(vec);  
+                    }   
+                }
+                catch(err){
+                    //nothing
+                }
             }
         }
         
@@ -215,9 +235,6 @@ class Bird{
     }
     
     run(frame_count, facing_vec, spatial_part){
-        
-        this.separation_force(spatial_part['position']);
-        
         this.update_kinematics();
         this.rotate_bird(facing_vec);
         
@@ -225,8 +242,15 @@ class Bird{
         this.realistic_wobble(frame_count);
         this.edges();
         this.animate(frame_count);
+        let all_vecs = this.get_all_vectors_to_check(spatial_part);
+        this.separation_force(all_vecs['position']);
         
-        this.debug(true, true, true, true);
+        //this.debug(true, true, true, true);
+        this.debug(true);
+
+        if(Number.isNaN(this.velocity.y)){
+            console.log('help');
+        }
     }
     
     
