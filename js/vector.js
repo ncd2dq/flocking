@@ -12,6 +12,11 @@ class Vector{
         this.y = y;
     }
     
+    round(){
+        this.x = Math.floor(this.x * 100) / 100;
+        this.y = Math.floor(this.y * 100) / 100;
+    }
+    
     zero(){
         // Reset vector to 0, 0
         this.x = 0;

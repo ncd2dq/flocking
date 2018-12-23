@@ -58,11 +58,11 @@ class Bird{
     edges(){
         //Ensure that the birds do not go off screen
         if(this.position.x >= width){
-            this.position.x = 0;
+            this.position.x = 0.1;
         } else if (this.position.x <= 0){
             this.position.x = width;
         } else if (this.position.y >= height){
-            this.position.y = 0;
+            this.position.y = 0.1;
         } else if (this.position.y <= 0){
             this.position.y = height;
         }
@@ -146,11 +146,44 @@ class Bird{
         }
     }
     
-    cohesion_force(){
+    cohesion_force(spatial_part){
+        // Determine the average vector to move towards the average location of other birds
+        let avg_coh = new Vector(0, 0);
+        let count = 0;
         
+        
+        for(let position_vec of spatial_part){
+            avg_coh.add(position_vec, true);
+            count++;   
+        }
+        
+        //When this becomes zero its an NaN
+        if(count > 0){
+            avg_coh.scale(1 / count, true);
+        }
+        avg_coh.sub(this.position, true);
+        avg_coh.scale(cohesion_rate / 100, true);
+        this.apply_force(avg_coh);
     }
     
-    alignment_force(){
+    alignment_force(spatial_part){
+        // Determine the average velocity of the heard to move towards
+        let avg_aln = new Vector(0, 0);
+        let count = 0;
+        
+        
+        for(let velocity_vec of spatial_part){
+            avg_aln.add(velocity_vec, true);
+            count++;   
+        }
+        
+        //When this becomes zero its an NaN
+        if(count > 0){
+            avg_aln.scale(1 / count, true);
+        }
+        avg_aln.sub(this.velocity, true);
+        avg_aln.scale(alignment_rate / 100, true);
+        this.apply_force(avg_aln);
         
     }
     
@@ -162,14 +195,15 @@ class Bird{
         
         for(let position_vec of spatial_part){
             avg_sep.add(position_vec, true);
-            count++;
+            count++;   
         }
         
-
-        
-        avg_sep.scale(1 / count, true);
+        //When this becomes zero its an NaN
+        if(count > 0){
+            avg_sep.scale(1 / count, true);
+        }
         avg_sep.sub(this.position, true);
-        avg_sep.scale(-0.01, true);
+        avg_sep.scale(-1 * (separation_rate / 100), true);
         this.apply_force(avg_sep);
         
     }
@@ -239,11 +273,13 @@ class Bird{
         this.rotate_bird(facing_vec);
         
         // Animation --
-        this.realistic_wobble(frame_count);
+        //this.realistic_wobble(frame_count);
         this.edges();
         this.animate(frame_count);
         let all_vecs = this.get_all_vectors_to_check(spatial_part);
         this.separation_force(all_vecs['position']);
+        this.cohesion_force(all_vecs['position']);
+        this.alignment_force(all_vecs['velocity']);
         
         //this.debug(true, true, true, true);
         this.debug(true);

@@ -31,13 +31,13 @@ function setup(){
     let bird_count_label = createDiv('Bird Count: ');
     // Rates of flocking sliders
     bird_count_slider.parent(bird_count_label);
-    cohesion_slider = createSlider(0, 5, 1);
+    cohesion_slider = createSlider(1, 10, 1);
     let cohesion_label = createDiv('Cohesion-|: ');
     cohesion_slider.parent(cohesion_label);
-    separation_slider = createSlider(0, 5, 1);
+    separation_slider = createSlider(1, 10, 1);
     let separation_label = createDiv('Separation: ');
     separation_slider.parent(separation_label);
-    alignment_slider = createSlider(0, 5, 1);
+    alignment_slider = createSlider(1, 10, 1);
     let alignment_label = createDiv('Alignment: ');
     alignment_slider.parent(alignment_label);
     // Perception range sliders
