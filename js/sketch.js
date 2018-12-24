@@ -8,6 +8,9 @@ let bird_count_slider, cohesion_slider, separation_slider, alignment_slider;
 let bird_count = 1, cohesion_rate = 0, separation_rate = 0, alignment_rate = 0;
 let cohesion_range = 10, separation_range = 10, alignment_range = 10;
 
+let partition_vector_button, seperation_range_button, cohesion_range_button, alignment_range_button, grid_button;
+let draw_partition = false, draw_separation = false, draw_cohesion = false, draw_alignment = false, draw_grid = false;
+
 let spatial_partition;
 let spatial_copy;
 
@@ -24,7 +27,7 @@ function setup(){
     // Spatial Partitioning initialize
     spatial_partition = new SpatialPartition(width, height, 7, 7);
     // Max range should be the radius of the circle enscribed by the 9 partition boxes
-    let max_range = Math.floor(spatial_partition.row_len * 3) / 2;
+    let max_range = (Math.floor(spatial_partition.row_len * 3) / 2) * 2;
 
     // Create customization sliders
     bird_count_slider = createSlider(0, 200, bird_count); 
@@ -50,6 +53,17 @@ function setup(){
     alignment_range_slider = createSlider(0, max_range, alignment_range);
     let alignment_range_label = createDiv('Alignment Range-|: ');
     alignment_range_slider.parent(alignment_range_label);
+    // Create debug buttons
+    partition_vector_button = createButton('Partition');
+    partition_vector_button.mousePressed(d_partition);
+    seperation_range_button = createButton('Separation');
+    seperation_range_button.mousePressed(d_separation);
+    cohesion_range_button = createButton('Cohesion');
+    cohesion_range_button.mousePressed(d_cohesion);
+    alignment_range_button = createButton('Alignment');
+    alignment_range_button.mousePressed(d_alignment);
+    grid_button = createButton('Grid');
+    grid_button.mousePressed(d_grid);
     
     // Animation settings
     angleMode(DEGREES);
@@ -81,7 +95,9 @@ function draw(){
 
     spatial_partition.reset_grid();
     spatial_partition.fill(all_birds);
-    spatial_partition.display();
+    if(draw_grid){
+        spatial_partition.display();
+    }
 }
 
 
@@ -137,6 +153,45 @@ function update_simulation_parameters(){
     }
 }
 
+function d_alignment(){
+    if(draw_alignment == false){
+        draw_alignment = true;
+    } else {
+        draw_alignment = false;
+    }
+}
+
+function d_partition(){
+    if(draw_partition == false){
+        draw_partition = true;
+    } else {
+        draw_partition = false;
+    }
+}
+
+function d_separation(){
+    if(draw_separation == false){
+        draw_separation = true;
+    } else {
+        draw_separation = false;
+    }
+}
+
+function d_cohesion(){
+    if(draw_cohesion == false){
+        draw_cohesion = true;
+    } else {
+        draw_cohesion = false;
+    }
+}
+
+function d_grid(){
+    if(draw_grid == false){
+        draw_grid = true;
+    } else {
+        draw_grid = false;
+    }
+}
 
 function mousePressed(){
     if(mouseX < width && mouseY < height){

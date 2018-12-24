@@ -122,11 +122,12 @@ class Bird{
     
     debug(p=false, c=false, s=false, a=false){
         // Debug drawing
-        // ::param p:: parition
+        // ::param p:: parition vector
         // ::param c:: cohesion circle
         // ::param s:: separation circle
         // ::param a:: alignment circle
         if(p){
+            fill(0, 0, 0);
             text('<' + this.partition[0] + ', ' + this.partition[1] + '>', this.position.x, this.position.y + 35);
         }
         if(c){
@@ -213,21 +214,26 @@ class Bird{
         // ::param check_indexes:: dictionary {'rows': List[int], 'cols': List[int]} of what to check in spatial_partition
         // ::return:: Dictionary[List[List[List[Vector]]]]
         
-        let vectors = {'position': [], 'velocity': []};
+        let vectors = {'cohesion': [], 'velocity': [], 'seperation': []};
         let check_indexes = this._get_indexes_to_check(spatial_part);
         
         for(let i of check_indexes['rows']){
             for(let j of check_indexes['cols']){
                 try{
-                    for(let vec of spatial_part['velocity'][i][j]){
-                        vectors['velocity'].push(vec);  
-                    }
                     for(let vec of spatial_part['position'][i][j]){
-                        vectors['position'].push(vec);  
-                    }   
+                        if(this.position.distance(vec) <= cohesion_range){
+                            vectors['cohesion'].push(vec);
+                        }
+                        if(this.position.distance(vec) <= separation_range){
+                            vectors['seperation'].push(vec);
+                        }
+                    } 
+                    for(let vec of spatial_part['velocity'][i][j]){
+                        vectors['velocity'].push(vec);
+                    } 
                 }
                 catch(err){
-                    //nothing
+                    console.log(err)
                 }
             }
         }
@@ -277,12 +283,11 @@ class Bird{
         this.edges();
         this.animate(frame_count);
         let all_vecs = this.get_all_vectors_to_check(spatial_part);
-        this.separation_force(all_vecs['position']);
-        this.cohesion_force(all_vecs['position']);
+        this.separation_force(all_vecs['seperation']);
+        this.cohesion_force(all_vecs['cohesion']);
         this.alignment_force(all_vecs['velocity']);
         
-        //this.debug(true, true, true, true);
-        this.debug(true);
+        this.debug(draw_partition, draw_cohesion, draw_separation, draw_alignment);
 
         if(Number.isNaN(this.velocity.y)){
             console.log('help');
