@@ -13,6 +13,7 @@ class Vector{
     }
     
     round(){
+        // Rounds vector to 2 decimal places
         this.x = Math.floor(this.x * 100) / 100;
         this.y = Math.floor(this.y * 100) / 100;
     }
@@ -30,7 +31,7 @@ class Vector{
     }
     
     add(other, inplace=false){
-        //Subtraction of a vector
+        //Addition vectors
         const new_x = this.x + other.x;
         const new_y = this.y + other.y;
         if(inplace){
@@ -42,7 +43,7 @@ class Vector{
     }
     
     sub(other, inplace=false){
-        //Subtraction of a vector
+        //Subtraction of vectors
         const new_x = this.x - other.x;
         const new_y = this.y - other.y;
         if(inplace){
@@ -102,6 +103,7 @@ class Vector{
     distance(other=false){
         //Return integer value distance between two vectors, or magnitude of current vector if
         //no other is provided
+        // ::param other Vector::
         if(other == false){
             other = new Vector(0, 0);
         }

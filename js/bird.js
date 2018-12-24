@@ -1,3 +1,4 @@
+// Utility function for loading bird sprites
 function create_animation_frames(){
     // Return a list of images
     const animation_frames = [];
@@ -6,6 +7,7 @@ function create_animation_frames(){
     }
     return animation_frames;
 }
+
 
 class Bird{
     constructor(animation_frames, rel_size){
@@ -16,15 +18,9 @@ class Bird{
         this.velocity = new Vector(0, 0);
         this.acceleration = new Vector(0, 0);
         this.max_speed = 10;
-        
         //
         // Animation
         //
-        // Wobble up and down to imitate upward force of wings flapping
-        this.wobble_max_cycle = 3;
-        this.wobble_cycle = Math.floor(Math.random() * 3);
-        this.wobble_magnitude = 1;
-        this.wobble_rate = 4; // High numbers yield slower wobble
         // Animate through sprite images
         this.frames = animation_frames;
         this.max_animation_index = this.frames.length - 1;
@@ -38,7 +34,7 @@ class Bird{
     }
     
     apply_force(force){
-        //Apply a force to objects current velocity
+        //Apply a force to bird's current velocity
         // ::param force:: Vector
         this.acceleration.add(force, true);
     }
@@ -56,7 +52,7 @@ class Bird{
     }
     
     edges(){
-        //Ensure that the birds do not go off screen
+        //Ensure that the birds do not go off screen by looping them
         if(this.position.x >= width){
             this.position.x = 0.1;
         } else if (this.position.x <= 0){
@@ -65,30 +61,6 @@ class Bird{
             this.position.y = 0.1;
         } else if (this.position.y <= 0){
             this.position.y = height;
-        }
-    }
-    
-    realistic_wobble(frame_count){
-        // This function makes the bird wobble up and down as an animation technique to simulate flight
-        // ::param frame_count:: integer
-        if(frame_count % this.wobble_rate == 0){
-            // Advance wobble cycle animation
-            if(this.wobble_cycle < this.wobble_max_cycle){
-                this.wobble_cycle++;
-            } else {
-                this.wobble_cycle = 0;
-            }
-            
-            // Apply wobble to position
-            if(this.wobble_cycle == 0){
-                this.position.y -= this.wobble_magnitude;
-            } else if (this.wobble_cycle == 1){
-                this.position.y += this.wobble_magnitude;
-            } else if (this.wobble_cycle == 2){
-                this.position.y += this.wobble_magnitude;
-            } else if (this.wobble_cycle == 3){
-                this.position.y -= this.wobble_magnitude;
-            }
         }
     }
     
@@ -148,10 +120,9 @@ class Bird{
     }
     
     cohesion_force(spatial_part){
-        // Determine the average vector to move towards the average location of other birds
+        // Determine the average position of the birds to move towards
         let avg_coh = new Vector(0, 0);
         let count = 0;
-        
         
         for(let position_vec of spatial_part){
             avg_coh.add(position_vec, true);
@@ -164,7 +135,7 @@ class Bird{
         }
         avg_coh.sub(this.position, true);
         avg_coh.scale(cohesion_rate / 100, true);
-        this.apply_force(avg_coh);
+        return avg_coh;
     }
     
     alignment_force(spatial_part){
@@ -184,8 +155,7 @@ class Bird{
         }
         avg_aln.sub(this.velocity, true);
         avg_aln.scale(alignment_rate / 100, true);
-        this.apply_force(avg_aln);
-        
+        return avg_aln;
     }
     
     separation_force(spatial_part){
@@ -205,17 +175,17 @@ class Bird{
         }
         avg_sep.sub(this.position, true);
         avg_sep.scale(-1 * (separation_rate / 100), true);
-        this.apply_force(avg_sep);
-        
+        return avg_sep;
     }
     
     get_all_vectors_to_check(spatial_part){
+        // Gets all vectors within the surrounding 9 blocks
         // ::param spatial_partition:: Dict[str, List[List[List[Vector]]]] - > [ [[], [], []], [[], [], []] ]
         // ::param check_indexes:: dictionary {'rows': List[int], 'cols': List[int]} of what to check in spatial_partition
         // ::return:: Dictionary[List[List[List[Vector]]]]
         
         let vectors = {'cohesion': [], 'velocity': [], 'seperation': []};
-        let check_indexes = this._get_indexes_to_check(spatial_part);
+        let check_indexes = this._get_indexes_to_check(this.partition);
         
         for(let i of check_indexes['rows']){
             for(let j of check_indexes['cols']){
@@ -233,7 +203,7 @@ class Bird{
                     } 
                 }
                 catch(err){
-                    console.log(err)
+                    //console.log(err)
                 }
             }
         }
@@ -241,57 +211,35 @@ class Bird{
         return vectors;
     }
     
-    _get_indexes_to_check(spatial_part){
-        // Returns the row / col indexes that a bird should check in the spatial_part dictionaries
-        // checks through the 9 surrounding boxes
-        
-        // TODO: convert this to a preestablished hashmap and have the birds look up their
-        //spatial partition as the key, eliminates the need for every bird to do this calculation
-        let rows, cols;
-        // Row finder
-        if(this.partition[0] == 0){
-            rows = [spatial_part['position'].length, 0, 1]; 
-        } else if (this.partition[0] == spatial_part['position'].length - 1){
-            rows = [this.partition[0] - 1, this.partition[0], 0]
-        } else {
-            rows = [this.partition[0] - 1, this.partition[0], this.partition[0] + 1];
-        }
-        // Col finder
-        if(this.partition[1] == 0){
-            cols = [spatial_part['position'][0].length, 0, 1]; 
-        } else if (this.partition[1] == spatial_part['position'][0].length - 1){
-            cols = [this.partition[1] - 1, this.partition[1], 0]
-        } else {
-            cols = [this.partition[1] - 1, this.partition[1], this.partition[1] + 1];
-        }
-        
-        return {'rows': rows, 'cols': cols};
-        
-
-    }
-    
-    flock(){
-        
+    _get_indexes_to_check(current_partition){
+        // Based on what grid position we are in, return what indexes we need to check
+        // for the surrounding 9
+        let hash_key = current_partition[0].toString() + ',' + current_partition[1].toString();
+        return partition_hash[hash_key];
     }
     
     run(frame_count, facing_vec, spatial_part){
+        // Executes all necessary functions of bird
         this.update_kinematics();
         this.rotate_bird(facing_vec);
         
-        // Animation --
-        //this.realistic_wobble(frame_count);
+        // Animation
         this.edges();
         this.animate(frame_count);
         let all_vecs = this.get_all_vectors_to_check(spatial_part);
-        this.separation_force(all_vecs['seperation']);
-        this.cohesion_force(all_vecs['cohesion']);
-        this.alignment_force(all_vecs['velocity']);
+        
+        // Determine flocking vector
+        let s = this.separation_force(all_vecs['seperation']);
+        let c = this.cohesion_force(all_vecs['cohesion']);
+        let a = this.alignment_force(all_vecs['velocity']);
+        let flock = s.add(c).add(a);
+        this.apply_force(flock);
         
         this.debug(draw_partition, draw_cohesion, draw_separation, draw_alignment);
 
-        if(Number.isNaN(this.velocity.y)){
+/*        if(Number.isNaN(this.velocity.y)){
             console.log('help');
-        }
+        }*/
     }
     
     

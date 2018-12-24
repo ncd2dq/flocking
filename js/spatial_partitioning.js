@@ -20,6 +20,7 @@ class SpatialPartition{
     }
     
     grid_copy(){
+        // Makes a deep copy of the grid with just vectors
         // ::return:: List[List[List[Vector]]] - > [ [[], [], []], [[], [], []] ]
         let grid_c = {'position': [], 'velocity': []};
         
@@ -38,7 +39,7 @@ class SpatialPartition{
     }
     
     snap_shot(partition, type){
-        // Produce a snapshot of positions or velocity
+        // Produce a snapshot of positions or velocity on a specific grid square
         // birds will use to not update one at at time but rather all at once
         // ::param partition:: List[int, int] position in grid
         // ::param type:: position/velocity to indicate what type of snapshot is needed
@@ -68,7 +69,7 @@ class SpatialPartition{
     }
     
     display(){
-        // Debugging, displays the grid
+        // Debugging, displays the grid lines
         fill(255, 255, 255);
         for(let i = 0; i < this.rows; i++){
             line(0, this.row_len * (i + 1), this.width, this.row_len * (i + 1));
@@ -122,5 +123,38 @@ class SpatialPartition{
         }
     }
     
-    
+    create_parition_hash(){
+        // Create hash map of what indexes a given bird should check in the spatial partition
+        let hash_map = {};
+        
+        for(let i = 0; i < this.rows; i++){
+            for(let j = 0; j < this.cols; j++){
+                // Instantiate dictionary to avoid key errors
+                hash_map[i.toString() + ',' + j.toString()] = {'rows': [], 'cols': []};
+                let row_list = [];
+                let col_list = [];
+                
+                // Rows List
+                if(i == 0){
+                    row_list = [this.rows - 1, 0, 1];
+                } else if (i == this.rows - 1){
+                    row_list = [i - 1, i, 0];
+                } else {
+                    row_list = [i - 1, i, i + 1];
+                }
+                
+                // Cols list
+                if(j == 0){
+                    col_list = [this.cols - 1, 0, 1];
+                } else if(j == this.cols - 1){
+                    col_list = [j - 1, j, 0];
+                } else {
+                    col_list = [j - 1, j, j + 1];
+                }
+                hash_map[i.toString() + ',' + j.toString()]['rows'] = row_list;
+                hash_map[i.toString() + ',' + j.toString()]['cols'] = col_list;
+            }
+        }
+        return hash_map;
+    }
 }

@@ -4,6 +4,7 @@ const width = 800;
 const height = 600;
 
 let bird_images;
+
 let bird_count_slider, cohesion_slider, separation_slider, alignment_slider;
 let bird_count = 1, cohesion_rate = 0, separation_rate = 0, alignment_rate = 0;
 let cohesion_range = 10, separation_range = 10, alignment_range = 10;
@@ -13,6 +14,8 @@ let draw_partition = false, draw_separation = false, draw_cohesion = false, draw
 
 let spatial_partition;
 let spatial_copy;
+
+let partition_hash;
 
 function preload(){
     //Preload all bird images and use them multiple times
@@ -32,6 +35,7 @@ function setup(){
     // Create customization sliders
     bird_count_slider = createSlider(0, 200, bird_count); 
     let bird_count_label = createDiv('Bird Count: ');
+    
     // Rates of flocking sliders
     bird_count_slider.parent(bird_count_label);
     cohesion_slider = createSlider(1, 10, 1);
@@ -43,6 +47,7 @@ function setup(){
     alignment_slider = createSlider(1, 10, 1);
     let alignment_label = createDiv('Alignment: ');
     alignment_slider.parent(alignment_label);
+    
     // Perception range sliders
     cohesion_range_slider = createSlider(0, max_range, cohesion_range);
     let cohesion_range_label = createDiv('Cohesion Range--||: ');
@@ -53,6 +58,7 @@ function setup(){
     alignment_range_slider = createSlider(0, max_range, alignment_range);
     let alignment_range_label = createDiv('Alignment Range-|: ');
     alignment_range_slider.parent(alignment_range_label);
+    
     // Create debug buttons
     partition_vector_button = createButton('Partition');
     partition_vector_button.mousePressed(d_partition);
@@ -77,13 +83,18 @@ function setup(){
     }
     
     spatial_partition.fill(all_birds);
-
+    
+    partition_hash = spatial_partition.create_parition_hash();
 }
 
 
 function draw(){
     clear();
+    
+    //Check if sliders moved
     update_simulation_parameters();
+    
+    // Take a snapshot of bird locations and velocities
     spatial_copy = spatial_partition.grid_copy();
     
     // Run all birds
@@ -92,7 +103,7 @@ function draw(){
         bird.run(frameCount, mouse_vec, spatial_copy);
     }
     
-
+    // Create spatial partitions
     spatial_partition.reset_grid();
     spatial_partition.fill(all_birds);
     if(draw_grid){
@@ -153,6 +164,7 @@ function update_simulation_parameters(){
     }
 }
 
+// Draw various debug aids
 function d_alignment(){
     if(draw_alignment == false){
         draw_alignment = true;
@@ -193,6 +205,7 @@ function d_grid(){
     }
 }
 
+// Birds chase mouse
 function mousePressed(){
     if(mouseX < width && mouseY < height){
         for(bird of all_birds){
