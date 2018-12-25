@@ -70,7 +70,7 @@ class SpatialPartition{
     
     display(){
         // Debugging, displays the grid lines
-        fill(255, 255, 255);
+        fill(grid_color);
         for(let i = 0; i < this.rows; i++){
             line(0, this.row_len * (i + 1), this.width, this.row_len * (i + 1));
         }

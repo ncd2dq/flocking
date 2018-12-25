@@ -99,22 +99,22 @@ class Bird{
         // ::param s:: separation circle
         // ::param a:: alignment circle
         if(p){
-            fill(0, 0, 0);
+            fill(grid_color);
             text('<' + this.partition[0] + ', ' + this.partition[1] + '>', this.position.x, this.position.y + 35);
         }
-        if(c){
+        if(c || s || a){
             noFill();
-            stroke(255, 0, 0);
+        }
+        if(c){
+            stroke(cohesion_color);
             ellipse(this.position.x, this.position.y, cohesion_range, cohesion_range);
         }
         if(s){
-            noFill();
-            stroke(0, 255, 0);
+            stroke(separation_color);
             ellipse(this.position.x, this.position.y, separation_range, separation_range);
         }
         if(a){
-            noFill();
-            stroke(0, 0, 255);
+            stroke(alignment_color);
             ellipse(this.position.x, this.position.y, alignment_range, alignment_range);
         }
     }

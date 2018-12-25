@@ -17,6 +17,12 @@ let spatial_copy;
 
 let partition_hash;
 
+// For speed of filling, make colors first
+let grid_color;
+let cohesion_color;
+let separation_color;
+let alignment_color;
+
 function preload(){
     //Preload all bird images and use them multiple times
     bird_images = create_animation_frames();
@@ -26,6 +32,12 @@ function setup(){
     // Initialize screen
     let canv = createCanvas(width, height);
     canv.parent('the_canvas');
+    
+    // Create colors
+    grid_color = color(0, 0, 0);
+    cohesion_color = color(0, 255, 0);
+    separation_color = color(255, 0, 0);
+    alignment_color = color(0, 0, 255);
     
     // Spatial Partitioning initialize
     spatial_partition = new SpatialPartition(width, height, 7, 7);
